@@ -1,71 +1,52 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../../contexts/AuthContext';
-import './Auth.css';
+import "./Auth.css";
+import { useState } from "react";
+import { loginService } from "../../services/authService";
+import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const { login } = useContext(AuthContext);
-    const navigate = useNavigate();
+const Login = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-        
-        try {
-            await login(username, password);
-            navigate('/dashboard');
-        } catch (err) {
-            setError(err.message || 'Error de autenticación');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const [form, setForm] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
 
-    return (
-        <div className="auth-container">
-            <div className="auth-card">
-                <h2>Iniciar Sesión</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="username">Usuario</label>
-                        <input 
-                            id="username"
-                            type="text"
-                            value={username} 
-                            onChange={e => setUsername(e.target.value)} 
-                            disabled={loading}
-                            required 
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="password">Contraseña</label>
-                        <input 
-                            id="password"
-                            type="password" 
-                            value={password} 
-                            onChange={e => setPassword(e.target.value)} 
-                            disabled={loading}
-                            required 
-                        />
-                    </div>
-                    
-                    {error && <div className="error-message">{error}</div>}
-                    
-                    <button type="submit" disabled={loading} className="btn-primary">
-                        {loading ? 'Cargando...' : 'Entrar'}
-                    </button>
-                </form>
-                
-                <div className="auth-footer">
-                    <p>¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link></p>
-                </div>
-            </div>
-        </div>
-    );
-}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const loggedUser = await loginService(form.username, form.password);
+      login(loggedUser);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <h2>Iniciar Sesión</h2>
+
+      {error && <p className="error">{error}</p>}
+
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Usuario"
+          value={form.username}
+          onChange={(e) => setForm({ ...form, username: e.target.value })}
+        />
+
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+        />
+
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+  );
+};
+
+export default Login;

@@ -1,2 +1,3 @@
 # WeChat
 Proyecto web
+cd 
