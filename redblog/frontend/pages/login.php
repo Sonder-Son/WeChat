@@ -1,9 +1,9 @@
 <?php
-// frontend/pages/login.php - VERSIÓN CON BASE DE DATOS REAL
+// frontend/pages/login.php - VERSIÓN CON RUTAS ABSOLUTAS
 session_start();
 
 if(isset($_SESSION['user'])) {
-    header('Location: ../index.php');
+    header('Location: /frontend/index.php');
     exit;
 }
 
@@ -20,19 +20,15 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Email y contraseña son obligatorios';
     } else {
         try {
-            // Conectar a la base de datos
             $database = new Database();
             $db = $database->getConnection();
             
-            // Crear objeto User
             $user = new User($db);
-            
-            // Intentar login
             $result = $user->login($email, $password);
             
             if($result['success']) {
                 $_SESSION['user'] = $result['user'];
-                header('Location: ../index.php');
+                header('Location: /frontend/index.php');
                 exit;
             } else {
                 $error = $result['message'];
@@ -50,7 +46,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - RedBlog</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="/frontend/css/style.css">
 </head>
 <body>
     <?php include '../includes/navbar.php'; ?>
@@ -65,7 +61,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
             
-            <form method="POST" action="">
+            <!-- Ruta absoluta en el action -->
+            <form method="POST" action="/frontend/pages/login.php">
+                
                 <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" class="form-input" 
@@ -85,7 +83,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div style="text-align: center; margin-top: 1rem;">
                     <span style="color: #6b7280;">¿No tienes cuenta? </span>
-                    <a href="register.php" class="text-link">Regístrate aquí</a>
+                    <a href="/frontend/pages/register.php" class="text-link">Regístrate aquí</a>
                 </div>
 
                 <!-- Credenciales de prueba -->
@@ -101,6 +99,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </div>
-    <script src="../js/script.js"></script>
+    <script src="/frontend/js/script.js"></script>
 </body>
 </html>
