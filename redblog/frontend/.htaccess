@@ -1,0 +1,13 @@
+# frontend/.htaccess
+DirectoryIndex index.php
+
+# Evitar listado de directorios
+Options -Indexes
+
+# Rewrite para URLs amigables
+RewriteEngine On
+
+# Redireccionar a index.php si el archivo no existe
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
